@@ -1,0 +1,36 @@
+{{ form.form_build_id }}
+{{ form.form_token }}
+{{ form.form_id }}
+
+<div class="row custom-form">
+ <div class="card" style="width: 24rem; margin:auto;">
+    <div class="img-container">
+      <img src="{{ img_path }}" alt="mpesalogo" height="100" width="180"/>
+	  </div>
+	  <div class="card-body">
+		<div class="details">
+		   <h6>Instructions</h6>
+		   <p>1. Input your number and Click on the "Send prompt" button. </p>
+
+		   <div class="alert alert-info">
+		        2.  A payment prompt will be sent to your phone.
+		        Then AFTER receiving a confirmation SMS from MPESA.
+		   </div>
+		   <p>3. Click on "Verify payment". </p>
+		</div>
+
+		{{ form.amount }}
+    {{ form.api_callback }}
+		{{ form.passkey }}
+		{{ form.output }}
+		{{ form.api_pass }}
+		{{ form.api_name }}
+		{{ form.return }}
+		{{ form.shortcode }}
+
+		{{ form.phone_number }}
+	    {{ form.link }}
+
+	  </div>
+ </div>
+</div>

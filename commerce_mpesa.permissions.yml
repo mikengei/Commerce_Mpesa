@@ -1,0 +1,3 @@
+administer commerce Mpesa:
+  title: 'Administer Mpesa Configs'
+  description: 'Allow Configuration of Mpesa module settings.'

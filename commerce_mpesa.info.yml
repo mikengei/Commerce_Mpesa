@@ -1,0 +1,7 @@
+name: Commerce Mpesa
+type: module
+description: "Lipa na Mpesa payment gateway"
+package: Commerce
+core_version_requirement: ^8 || ^9
+dependencies:
+  - commerce:commerce_payment

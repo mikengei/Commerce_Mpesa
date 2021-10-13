@@ -1,0 +1,16 @@
+#PRESETS FOR MPESA API
+commerce_payment.commerce_payment_gateway.plugin.commerce_mpesa:
+  type: commerce_payment_gateway_configuration
+  mapping:
+    mpesaAPI_shortcode:
+      type: string
+      label: 'Short_Code'
+    mpesaAPI_passkey:
+      type: string
+      label: 'Pass key'
+    mpesaAPI_name:
+      type: string
+      label: 'API Username'
+    mpesaAPI_pass:
+      type: string
+      label: 'API Pass'

@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ *  Defines common functionality and overrides/hooks for Commerce Mpesa module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+
+/**
+ * Implements hook_help().
+ */
+function commerce_mpesa_help($route_name, RouteMatchInterface $route_match) {
+    switch ($route_name) {
+        case 'help.page.commerce_mpesa':
+        $output = '';
+        $output .= '<p>';
+        $output .= t('The modules list page can become quite big when dealing with a fairly large site or even just a dev site meant for testing new and various modules being considered.');
+        $output .= '</p>';
+        $output .= '<p>';
+        $output .= t('What this module aims to accomplish is the ability to quickly find the module you are looking for without having to rely on the browsers search feature which more times than not shows you the module name in the -Required by- or -Depends on- sections of the various modules or even some other location on the page like a menu item.');
+        $output .= '</p>';
+        $output .= '<p>';
+        $output .= t('See the <a href=":project_page">project page on Drupal.org</a> for more details.', [':project_page' => 'https://www.drupal.org/project/module_filter']);
+
+    return $output;
+    }
+}
+
+/**
+ * Implements hook_theme()
+ */
+function commerce_mpesa_theme($existing, $type, $theme, $path){
+  return array(
+    'mpesa_tpl' =>array(
+      'render element' => 'form',
+    )
+  );
+}
+
+/**
+ * Implements hook_preprocess().
+ */
+function commerce_mpesa_preprocess(&$variables, $hook) {
+    $variables['img_path']= file_create_url(drupal_get_path('module', 'commerce_mpesa').'/icons/mpesa.svg');
+}
+

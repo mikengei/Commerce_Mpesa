@@ -1,0 +1,7 @@
+commerce_mpesa.redirect_stk:
+  path: '/mpesa_payment'
+  defaults:
+    _form: \Drupal\commerce_mpesa\Form\Mpesa_stk
+    _title: 'MPESA | PAY'
+  requirements:
+    _permission: 'access content'
