@@ -7,6 +7,7 @@ use Drupal\commerce_payment\Plugin\Commerce\PaymentGateway\OffsitePaymentGateway
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\commerce_order\Entity\OrderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides the Off-site Redirect payment gateway.
@@ -28,6 +29,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class MpesaOffsite extends OffsitePaymentGatewayBase{
 
+  /**
+   * The current request.
+   *
+   * @var \Symfony\Component\HttpFoundation\Request
+   */
+  protected $currentRequest;
 
   //build the ui for the configuration for payment
   public function defaultConfiguration() {
@@ -77,8 +84,6 @@ class MpesaOffsite extends OffsitePaymentGatewayBase{
       '#required' => TRUE,
       '#description' => t('Set your API password string'),
     ];
-
-
     return $form;
   }
 
@@ -98,8 +103,8 @@ class MpesaOffsite extends OffsitePaymentGatewayBase{
    * {@inheritdoc}
    */
   public function onReturn(OrderInterface $order, Request $request) {
-    $val=$request->get('mike');
-    //check payment
+     $query=$request->getQueryString();
+
     $order_id=$order->id();
     //$orderAmount = round($order->getTotalPrice()->getNumber());
     $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');

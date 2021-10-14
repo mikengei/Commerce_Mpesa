@@ -37,9 +37,11 @@ class Mpesa_stk extends FormBase{
   public $the_amount;
 
   /**
-   * The total amount for user to pay
-   * @var $the_amount
+   * The Mpesa CheckoutID
+   * @var $checkoutId
    */
+  public $checkoutId;
+
   public $shortcode;
   public $passkey;
   public $api_pass;
@@ -163,7 +165,6 @@ class Mpesa_stk extends FormBase{
         '#description'    => t('Return URL'),
         '#required'       => TRUE
       ];
-
       $form['phone_number']=[
         '#title'          => t('Phone Number'),
         '#type'           => 'textfield',
@@ -173,7 +174,7 @@ class Mpesa_stk extends FormBase{
                 'callback'        => '::send_stk',
                 'disable-refocus' => FALSE,
                 'event'           => 'change',
-                'wrapper'         => 'mp_resp',
+                'wrapper'         => 'resp_btn',
                 'progress'        => [
                                   'type' => 'throbber',
                                   'message' => $this->t('Sending prompt...'),
@@ -184,19 +185,10 @@ class Mpesa_stk extends FormBase{
         '#suffix'         => '<div><a href="#" class="btn btn-primary button button--primary btn-prompt">Send prompt</a></div>',
         '#required'       => TRUE,
       ];
-
-      $form['output'] = [
-          '#type' => 'item',
-          '#title' => '',
-          '#prefix' => '<div id="mp_resp">',
-          '#suffix' => '</div>'
-      ];
-
       $form['link'] = [
         '#type' => 'item',
-        '#prefix' => '<div id="mybtn">
-                       <a href='.$this->return_url.' class="btn btn-success btn-verify">Verify Payment',
-        '#suffix' => '</a></div>'
+        '#prefix' => '<div id="resp_btn">',
+        '#suffix' => '</div>',
       ];
 
       $form['actions']['#type'] = 'actions';
@@ -216,35 +208,23 @@ class Mpesa_stk extends FormBase{
      */
   public function validateForm(array & $form, FormStateInterface $form_state) {
 
-      $phoneNum=$form_state->getValue('phone_number');
+    $phoneNum = $form_state->getValue('phone_number');
 
-      if(strlen($phoneNum) < 11) {
-        if (!substr($phoneNum, 0, 1) === '0') {
-          $form_state->setErrorByName('phone_number',  $this->t('Invalid Number format'));
-        }
-      }else{ $form_state->setErrorByName('phone_number', $this->t('Invalid Number format'));}
+    if (strlen($phoneNum) < 11) {
+      if (!substr($phoneNum, 0, 1) === '0') {
+        $form_state->setErrorByName('phone_number', $this->t('Invalid Number format'));
+      }
     }
+    else {
+      $form_state->setErrorByName('phone_number', $this->t('Invalid Number format'));
+    }
+  }
 
   /**
      * @inheritDoc
      */
-  public function submitForm(array &$form, FormStateInterface $form_state)
-    {
-         $return_url =$form_state->getValue('return');
-         //http://localhost/D8/web/checkout/60/payment/return
-         //checkout/60/payment/return
-        $response = new RedirectResponse($return_url);
-        $response->send();
-        return;
-        /* $path = '/checkout/$orderId/payment/return';
-         query string
-          $path_param = [
-            'abc' => '123',
-            'xyz' => '456'
-          ];
-      // use below if you have to redirect on your known url
-          $url = Url::fromUserInput($return_url);
-          //$form_state->setRedirectUrl($url);*/
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+         //TODO
   }
   /**
    * Format mobile number
@@ -261,7 +241,7 @@ class Mpesa_stk extends FormBase{
   /**
    * Get an mpesa token
    *
-   * @return string
+   * @return string token
    */
   private function mpesa_token($auth_name,$auth_pass){
       try {
@@ -281,6 +261,7 @@ class Mpesa_stk extends FormBase{
            \Drupal::logger('Commerce Mpesa')->error($e->getMessage());
            $this->messenger()->addError($this->t('Sorry this service is unavailable.. token'));
       }
+    return false;
   }
 
   /**
@@ -315,13 +296,11 @@ class Mpesa_stk extends FormBase{
               ]
         ]);
         $response_stk = json_decode($stk_req->getBody()->getContents(), true);
-
         \Drupal::logger('Commerce Mpesa')->info('STK prompted successful for:'. $stk_num );
             //confirm payment
         if($response_stk['ResultCode']==0){
             //insert into db
-            $checkoutId=$response_stk['CheckoutRequestID'];
-            $this->currentRequest->request->set('mike','mmmasd');
+            $this->checkoutId=$response_stk['CheckoutRequestID'];
             //$this->mpesatbl_insert($response_stk);
         }
 
@@ -360,9 +339,12 @@ class Mpesa_stk extends FormBase{
          $phone_number=$form_state->getValue('phone_number');
          $callback=$form_state->getValue('api_callback');
          //token
-          $token=$this->mpesa_token($api_name,$api_pass);
-
+           $token=$this->mpesa_token($api_name,$api_pass);
           $this->mpesa_stk($shortcode,$passkey,$amount,$phone_number,$token,$callback);
+
+          $onreturn_url=$this->return_url .'?'. $this->checkoutId;
+    $form['output']['#prefix']= '<a href="'.$onreturn_url.'" class="btn btn-success">Verify Payment</a>';
+    return $form['output'];
   }
 
 
