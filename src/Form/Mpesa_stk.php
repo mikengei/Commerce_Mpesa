@@ -239,7 +239,7 @@ class Mpesa_stk extends FormBase{
       return $number;
     }
   /**
-   * Get an mpesa token
+   * Get an Mpesa token
    *
    * @return string token
    */

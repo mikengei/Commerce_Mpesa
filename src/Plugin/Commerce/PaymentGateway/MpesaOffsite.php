@@ -103,25 +103,48 @@ class MpesaOffsite extends OffsitePaymentGatewayBase{
    * {@inheritdoc}
    */
   public function onReturn(OrderInterface $order, Request $request) {
-     $query=$request->getQueryString();
+    $checkout_id=$request->getQueryString();
 
-    $order_id=$order->id();
-    //$orderAmount = round($order->getTotalPrice()->getNumber());
-    $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
-    //create payment
-    $payment = $payment_storage->create([
-      'state' => 'Mpesa Paid',
-      'amount' => $order->getTotalPrice(),
-      'completed' => 'Success',
-      'payment_gateway' => $this->entityId,
-      'order_id' => $order_id,
-      'remote_id' => 'MMJASD33457',
-      'remote_state' => 'Mpesa Received',
-    ]);
-    //$logger->info('Saving Payment information. Transaction reference: ');
-    $payment->save();
-    \Drupal::logger('Commerce Mpesa')->notice('Payment Success on order: @order', array('@order' => $order_id));
-    \Drupal::messenger()->addStatus('Payment was processed successfully');
+    if(!empty($checkout_id)){
+      try {
+         $conn=\Drupal::service('database');
+         $query=$conn->query(
+            "SELECT checkoutRequestID
+             FROM {commerce_mpesa_ipn}
+             WHERE checkoutRequestID= :check_req_id",
+             [ ':check_req_id' => $checkout_id ]
+         );
+         $query->allowRowCount=TRUE;
+         if($query->rowCount() === 1 ){
+              //save payment
+           $order_id =$order->id();
+           $orderAmount = round($order->getTotalPrice()->getNumber());
+           $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
+           //create payment
+           $payment = $payment_storage->create([
+             'state' => 'Paid',
+             'amount' => $order->getTotalPrice(),
+             'completed' => 'Mpesa-Success',
+             'payment_gateway' => $this->entityId,
+             'order_id' => $order_id,
+             'remote_id' => $checkout_id,
+             'remote_state' => 'Mpesa Received',
+           ]);
+
+           $payment->save();
+           \Drupal::logger('Commerce Mpesa')->notice('Payment Success on order: @order', array('@order' => $order_id));
+           \Drupal::messenger()->addStatus('Payment was successfully');
+         }else{
+           throw new PaymentGatewayException('There was a Problem processing your payment...');
+         }
+
+      }catch (\Exception $e){
+        \Drupal::logger('Commerce Mpesa')->error($e->getMessage());
+      }
+
+    }else{
+      throw new PaymentGatewayException('Payment has not been received');
+    }
   }
 
   /**
