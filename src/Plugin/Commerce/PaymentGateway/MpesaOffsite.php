@@ -109,16 +109,14 @@ class MpesaOffsite extends OffsitePaymentGatewayBase{
       try {
          $conn=\Drupal::service('database');
          $query=$conn->query(
-            "SELECT checkoutRequestID
-             FROM {commerce_mpesa_ipn}
-             WHERE checkoutRequestID= :check_req_id",
+            "SELECT checkoutRequestID FROM {commerce_mpesa_ipn} WHERE checkoutRequestID= :check_req_id",
              [ ':check_req_id' => $checkout_id ]
          );
          $query->allowRowCount=TRUE;
-         if($query->rowCount() === 1 ){
-              //save payment
+         $count=$query->rowCount();
+         if( $count == 1 ){
+
            $order_id =$order->id();
-           $orderAmount = round($order->getTotalPrice()->getNumber());
            $payment_storage = $this->entityTypeManager->getStorage('commerce_payment');
            //create payment
            $payment = $payment_storage->create([
@@ -140,10 +138,8 @@ class MpesaOffsite extends OffsitePaymentGatewayBase{
 
       }catch (\Exception $e){
         \Drupal::logger('Commerce Mpesa')->error($e->getMessage());
+        //throw new PaymentGatewayException('There was a Problem processing your payment...');
       }
-
-    }else{
-      throw new PaymentGatewayException('Payment has not been received');
     }
   }
 
@@ -178,4 +174,10 @@ class MpesaOffsite extends OffsitePaymentGatewayBase{
       }
   }
 
+  public function onCancel(OrderInterface $order, Request $request) {
+    $this->messenger()->addMessage($this->t('You have canceled checkout at @gateway but may resume the checkout process here when you are ready.', [
+      '@gateway' => $this->getDisplayLabel(),
+    ]));
+  }
 }
+

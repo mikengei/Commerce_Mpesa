@@ -62,46 +62,5 @@ function commerce_mpesa_schema(){
     'primary key' => array('id'),
   );
 
-  $schema['commerce_mpesa_ref']=array(
-    'description' => 'Table to store Mpesa payment STK responses ',
-    'fields'      => array(
-      'id' => [
-        'description'  =>  'Auto incrementing primary key',
-        'type'         =>  'serial',
-        'unsigned'     =>  TRUE,
-        'not null'     =>  TRUE,
-      ],
-      'merchantRequestID' => [
-        'description'  =>  'This is a global unique Identifier for any submitted payment request.',
-        'type'         =>  'varchar',
-        'length'       =>  128,
-        'default'      =>  ''
-      ],
-      'checkoutRequestID' => [
-        'description'  =>  'This is a global unique identifier of the processed checkout transaction request.',
-        'type'         =>  'varchar',
-        'length'       =>  128,
-        'default'      =>  ''
-      ],
-      'resp_code' => [
-        'description'  =>  'This is a Numeric status code that indicates the status of the transaction submission.',
-        'type'         =>  'varchar',
-        'length'       =>  128,
-        'default'      =>  ''
-      ],
-      'resp_desc' => [
-        'description'  =>  'Response description is an acknowledgment message from the API',
-        'type'         =>  'varchar',
-        'length'       =>  128,
-        'default'      =>  ''
-      ],
-      'timestamp' => [
-        'description'  =>  'The Unix timestamp when the node was created',
-        'type'         =>  'int',
-      ]
-    ),
-    'primary key' => array('id'),
-  );
-
   return $schema;
 }
