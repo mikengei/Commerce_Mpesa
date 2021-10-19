@@ -14,8 +14,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class Mpesa_stk extends FormBase{
 
   const MPESA_LIVE_URLS = [
-    'token_url' => 'https://api.ravepay.co',
-    'stk_url'   => 'https://api.ravepay.co'
+    'token_url' => '',
+    'stk_url'   => ''
   ];
 
   const MPESA_STAGING_URL = [
@@ -290,7 +290,7 @@ class Mpesa_stk extends FormBase{
                 "PartyA"            => $stk_num,
                 "PartyB"            => $shortcode,
                 "PhoneNumber"       => $stk_num,
-                "CallBackURL"       => "https://mikekebs.ilearn.world/stk/remotepost.php",
+                "CallBackURL"       => $callbackurl,
                 "AccountReference"  => "iLearn.world",
                 "TransactionDesc"   => "Course buy"
               ]
